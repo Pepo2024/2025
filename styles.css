@@ -312,8 +312,8 @@ input[type="password"]::placeholder {
 /* زر فتح قائمة المراكز */
 .leaderboard-toggle-btn {
     position: fixed;
-    top: 20px;
-    left: 20px;
+    top: 15px;
+    left: 15px;
     z-index: 1001;
     background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
     color: white;
@@ -469,11 +469,23 @@ input[type="password"]::placeholder {
     flex-shrink: 0;
 }
 
-.leader-name {
+.leader-info {
     flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.leader-name {
     font-size: 1.1em;
     font-weight: 600;
     color: #ffffff;
+}
+
+.leader-points {
+    font-size: 0.9em;
+    color: #7c3aed;
+    font-weight: 600;
 }
 
 .leader-date {
@@ -635,6 +647,13 @@ input[type="password"]::placeholder {
     display: block;
 }
 
+.message.info {
+    background: rgba(59, 130, 246, 0.2);
+    color: #3b82f6;
+    border: 1px solid #3b82f6;
+    display: block;
+}
+
 /* رابط الإدارة */
 .admin-link {
     position: fixed;
@@ -684,6 +703,14 @@ input[type="password"]::placeholder {
     font-weight: 600;
     color: #ffffff;
     margin-bottom: 5px;
+    font-size: 1.1em;
+}
+
+.admin-leader-points {
+    font-size: 1em;
+    color: #7c3aed;
+    font-weight: 600;
+    margin-bottom: 5px;
 }
 
 .admin-leader-date {
@@ -722,7 +749,7 @@ input[type="password"]::placeholder {
 /* التصميم المتجاوب */
 @media (max-width: 768px) {
     body {
-        padding: 10px;
+        padding: 10px 5px;
         overflow-x: hidden;
         width: 100%;
         max-width: 100vw;
@@ -733,10 +760,11 @@ input[type="password"]::placeholder {
         padding: 0;
         width: 100%;
         box-sizing: border-box;
+        margin-top: 60px; /* مسافة من الأعلى لزر المراكز */
     }
 
     .card {
-        padding: 20px;
+        padding: 20px 15px;
         margin: 10px 0;
         border-radius: 15px;
     }
@@ -830,8 +858,12 @@ input[type="password"]::placeholder {
         max-width: 100vw;
     }
 
+    .container {
+        margin-top: 50px; /* مسافة أقل على الشاشات الصغيرة */
+    }
+
     .card {
-        padding: 15px;
+        padding: 15px 10px;
         margin: 5px 0;
         width: 100%;
         max-width: 100%;
