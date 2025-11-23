@@ -14,7 +14,10 @@
                 <h1>صفحة الإدارة</h1>
                 <p class="subtitle">أدخل كلمة المرور للوصول</p>
                 <form id="loginForm">
-                    <input type="password" id="adminPassword" placeholder="كلمة المرور" required>
+                    <div class="password-input-container">
+                        <input type="password" id="adminPassword" placeholder="كلمة المرور" required>
+                        <button type="button" id="togglePassword" class="toggle-password-btn">👁️</button>
+                    </div>
                     <button type="submit" class="btn btn-primary">دخول</button>
                 </form>
                 <div id="loginMessage" class="message"></div>
