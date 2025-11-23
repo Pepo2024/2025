@@ -5,8 +5,8 @@ import { getDatabase, ref, set, get } from 'https://www.gstatic.com/firebasejs/1
 let database;
 let firebaseApp;
 
-// كلمة مرور الإدارة (يمكن تغييرها)
-const ADMIN_PASSWORD = 'admin123'; // قم بتغيير هذه الكلمة
+// كلمة مرور الإدارة
+const ADMIN_PASSWORD = '2025';
 
 // البيانات الافتراضية
 const defaultQuestions = [
@@ -131,6 +131,25 @@ function showAdminPage() {
     isAuthenticated = true;
     loadAndRenderQuestions();
     loadLeaderboardAdmin();
+}
+
+// تهيئة زر إظهار/إخفاء كلمة المرور
+function initTogglePassword() {
+    const togglePasswordBtn = document.getElementById('togglePassword');
+    if (togglePasswordBtn) {
+        togglePasswordBtn.addEventListener('click', () => {
+            const passwordInput = document.getElementById('adminPassword');
+            if (passwordInput) {
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    togglePasswordBtn.textContent = '🙈';
+                } else {
+                    passwordInput.type = 'password';
+                    togglePasswordBtn.textContent = '👁️';
+                }
+            }
+        });
+    }
 }
 
 // معالج تسجيل الدخول
@@ -453,5 +472,6 @@ async function removeFromLeaderboard(leaderId) {
 // تحميل الصفحة
 window.addEventListener('load', async () => {
     await initFirebase();
+    initTogglePassword();
     checkSession();
 });
