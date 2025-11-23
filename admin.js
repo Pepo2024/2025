@@ -387,14 +387,17 @@ async function loadLeaderboardAdmin() {
         
         const leaders = [];
         snapshot.forEach((childSnapshot) => {
+            const data = childSnapshot.val();
             leaders.push({
                 id: childSnapshot.key,
-                ...childSnapshot.val()
+                name: data.name || childSnapshot.key,
+                points: data.points || 0,
+                date: data.date || 'تاريخ غير محدد'
             });
         });
         
-        // ترتيب حسب التاريخ (الأحدث أولاً)
-        leaders.sort((a, b) => b.timestamp - a.timestamp);
+        // ترتيب حسب النقاط (الأعلى أولاً)
+        leaders.sort((a, b) => b.points - a.points);
         
         if (leaders.length === 0) {
             container.innerHTML = '<p class="no-leaders-admin">لا يوجد متسابقين في قائمة المراكز</p>';
@@ -407,7 +410,8 @@ async function loadLeaderboardAdmin() {
             leaderItem.innerHTML = `
                 <div class="admin-leader-info">
                     <div class="admin-leader-name">${leader.name}</div>
-                    <div class="admin-leader-date">${leader.date || 'تاريخ غير محدد'}</div>
+                    <div class="admin-leader-points">${leader.points} نقطة</div>
+                    <div class="admin-leader-date">${leader.date}</div>
                 </div>
                 <div class="admin-leader-actions">
                     <button class="remove-leader-btn" data-leader-id="${leader.id}">حذف من المراكز</button>
@@ -420,7 +424,8 @@ async function loadLeaderboardAdmin() {
         document.querySelectorAll('.remove-leader-btn').forEach(btn => {
             btn.addEventListener('click', async (e) => {
                 const leaderId = e.target.dataset.leaderId;
-                if (confirm(`هل أنت متأكد من حذف ${leaders.find(l => l.id === leaderId)?.name} من قائمة المراكز؟`)) {
+                const leader = leaders.find(l => l.id === leaderId);
+                if (confirm(`هل أنت متأكد من حذف ${leader?.name} من قائمة المراكز؟`)) {
                     await removeFromLeaderboard(leaderId);
                 }
             });
