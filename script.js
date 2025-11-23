@@ -81,40 +81,134 @@ async function saveQuestions(questions) {
     }
 }
 
+// الحصول على معرف المسابقة الحالية (بناءً على الأسئلة)
+function getQuizId(questions) {
+    // إنشاء معرف فريد للمسابقة بناءً على محتوى الأسئلة
+    const questionsString = JSON.stringify(questions.map(q => q.question));
+    // استخدام hash بسيط
+    let hash = 0;
+    for (let i = 0; i < questionsString.length; i++) {
+        const char = questionsString.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash; // Convert to 32bit integer
+    }
+    return Math.abs(hash).toString();
+}
+
+// التحقق من حل المستخدم للمسابقة من قبل
+async function hasUserSolvedQuiz(userName, quizId) {
+    if (!database) return false;
+    
+    try {
+        const userQuizzesRef = ref(database, `userQuizzes/${userName}/${quizId}`);
+        const snapshot = await get(userQuizzesRef);
+        return snapshot.exists();
+    } catch (error) {
+        console.error('خطأ في التحقق من المسابقة:', error);
+        return false;
+    }
+}
+
 // حفظ نتيجة المستخدم في Firebase
 async function saveUserResult(userName, score, totalQuestions) {
     if (!database) return;
     
     try {
+        const quizId = getQuizId(questions);
+        
+        // التحقق من حل المسابقة من قبل
+        const alreadySolved = await hasUserSolvedQuiz(userName, quizId);
+        if (alreadySolved) {
+            alert('لقد قمت بحل هذه المسابقة من قبل! لا يمكنك الحصول على نقاط إضافية.');
+            return;
+        }
+        
+        // حساب النقاط (النقاط = عدد الإجابات الصحيحة)
+        const points = score;
+        
+        // حفظ المسابقة المحلولة
+        const userQuizRef = ref(database, `userQuizzes/${userName}/${quizId}`);
+        await set(userQuizRef, {
+            score: score,
+            totalQuestions: totalQuestions,
+            timestamp: Date.now(),
+            date: new Date().toLocaleString('ar-EG')
+        });
+        
+        // حفظ النتيجة في سجل المستخدمين
         const userResult = {
             name: userName,
             score: score,
             totalQuestions: totalQuestions,
             percentage: Math.round((score / totalQuestions) * 100),
+            points: points,
+            quizId: quizId,
             timestamp: Date.now(),
             date: new Date().toLocaleString('ar-EG')
         };
         
-        // حفظ في قاعدة بيانات المستخدمين
         const usersRef = ref(database, 'users');
         const newUserRef = push(usersRef);
         await set(newUserRef, userResult);
         
-        // حفظ في قائمة المراكز (فقط للمجيبين بشكل صحيح)
-        if (score === totalQuestions) {
-            const leaderboardRef = ref(database, 'leaderboard');
-            const newLeaderRef = push(leaderboardRef);
-            await set(newLeaderRef, {
-                name: userName,
-                timestamp: Date.now(),
-                date: new Date().toLocaleString('ar-EG')
-            });
+        // تحديث نقاط المستخدم الإجمالية
+        const userPointsRef = ref(database, `userPoints/${userName}`);
+        const pointsSnapshot = await get(userPointsRef);
+        let totalPoints = points;
+        if (pointsSnapshot.exists()) {
+            totalPoints = (pointsSnapshot.val() || 0) + points;
         }
+        await set(userPointsRef, totalPoints);
+        
+        // تحديث قائمة المراكز بناءً على النقاط الإجمالية
+        await updateLeaderboard(userName, totalPoints);
         
         // تحديث قائمة المراكز
         loadLeaderboard();
     } catch (error) {
         console.error('خطأ في حفظ النتيجة:', error);
+    }
+}
+
+// تحديث قائمة المراكز
+async function updateLeaderboard(userName, totalPoints) {
+    if (!database) return;
+    
+    try {
+        // الحصول على جميع المستخدمين ونقاطهم
+        const userPointsRef = ref(database, 'userPoints');
+        const snapshot = await get(userPointsRef);
+        
+        const allUsers = [];
+        if (snapshot.exists()) {
+            snapshot.forEach((childSnapshot) => {
+                allUsers.push({
+                    name: childSnapshot.key,
+                    points: childSnapshot.val() || 0
+                });
+            });
+        }
+        
+        // ترتيب حسب النقاط (الأعلى أولاً)
+        allUsers.sort((a, b) => b.points - a.points);
+        
+        // حفظ أول 7 فقط في قائمة المراكز
+        const leaderboardRef = ref(database, 'leaderboard');
+        await set(leaderboardRef, null); // مسح القائمة القديمة
+        
+        const top7 = allUsers.slice(0, 7);
+        for (let i = 0; i < top7.length; i++) {
+            const userRef = ref(database, `leaderboard/${top7[i].name}`);
+            await set(userRef, {
+                name: top7[i].name,
+                points: top7[i].points,
+                rank: i + 1,
+                timestamp: Date.now(),
+                date: new Date().toLocaleString('ar-EG')
+            });
+        }
+    } catch (error) {
+        console.error('خطأ في تحديث قائمة المراكز:', error);
     }
 }
 
@@ -136,17 +230,21 @@ function loadLeaderboard() {
         
         const leaders = [];
         snapshot.forEach((childSnapshot) => {
+            const data = childSnapshot.val();
             leaders.push({
                 id: childSnapshot.key,
-                ...childSnapshot.val()
+                name: data.name || childSnapshot.key,
+                points: data.points || 0,
+                rank: data.rank || 0,
+                date: data.date || 'تاريخ غير محدد'
             });
         });
         
-        // ترتيب حسب التاريخ (الأحدث أولاً)
-        leaders.sort((a, b) => b.timestamp - a.timestamp);
+        // ترتيب حسب النقاط (الأعلى أولاً)
+        leaders.sort((a, b) => b.points - a.points);
         
-        // عرض أول 10 فقط
-        const topLeaders = leaders.slice(0, 10);
+        // عرض أول 7 فقط
+        const topLeaders = leaders.slice(0, 7);
         
         if (topLeaders.length === 0) {
             leaderboardList.innerHTML = '<p class="no-leaders">لا يوجد متسابقين في قائمة المراكز بعد</p>';
@@ -158,8 +256,10 @@ function loadLeaderboard() {
             leaderItem.className = 'leader-item';
             leaderItem.innerHTML = `
                 <div class="leader-rank">${index + 1}</div>
-                <div class="leader-name">${leader.name}</div>
-                <div class="leader-date">${leader.date || 'تاريخ غير محدد'}</div>
+                <div class="leader-info">
+                    <div class="leader-name">${leader.name}</div>
+                    <div class="leader-points">${leader.points} نقطة</div>
+                </div>
             `;
             leaderboardList.appendChild(leaderItem);
         });
@@ -248,11 +348,24 @@ nameForm.addEventListener('submit', async (e) => {
 });
 
 // بدء المسابقة
-function startQuiz() {
-    currentQuestionIndex = 0;
-    userAnswers = [];
-    showPage('quizPage');
-    loadQuestion();
+async function startQuiz() {
+    // التحقق من حل المسابقة من قبل
+    const quizId = getQuizId(questions);
+    const alreadySolved = await hasUserSolvedQuiz(userName, quizId);
+    
+    if (alreadySolved) {
+        if (confirm('لقد قمت بحل هذه المسابقة من قبل! هل تريد حلها مرة أخرى (لن تحصل على نقاط)؟')) {
+            currentQuestionIndex = 0;
+            userAnswers = [];
+            showPage('quizPage');
+            loadQuestion();
+        }
+    } else {
+        currentQuestionIndex = 0;
+        userAnswers = [];
+        showPage('quizPage');
+        loadQuestion();
+    }
 }
 
 // تحميل السؤال الحالي
@@ -347,8 +460,20 @@ async function showResults() {
     document.getElementById('scoreNumber').textContent = correctAnswers;
     document.getElementById('maxScore').textContent = questions.length;
 
-    // حفظ النتيجة في Firebase
-    await saveUserResult(userName, correctAnswers, questions.length);
+    // التحقق من حل المسابقة من قبل
+    const quizId = getQuizId(questions);
+    const alreadySolved = await hasUserSolvedQuiz(userName, quizId);
+    
+    if (!alreadySolved) {
+        // حفظ النتيجة في Firebase فقط إذا لم يحل المسابقة من قبل
+        await saveUserResult(userName, correctAnswers, questions.length);
+    } else {
+        // عرض رسالة أن المسابقة تم حلها من قبل
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'message info';
+        messageDiv.textContent = 'لقد قمت بحل هذه المسابقة من قبل! لم يتم إضافة نقاط جديدة.';
+        resultsDetails.insertBefore(messageDiv, resultsDetails.firstChild);
+    }
     
     // تحديث قائمة المراكز
     loadLeaderboard();
