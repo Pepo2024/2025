@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>صفحة الإدارة - Admin</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- صفحة تسجيل الدخول -->
+    <div id="loginPage" class="page active">
+        <div class="container">
+            <div class="card">
+                <h1>صفحة الإدارة</h1>
+                <p class="subtitle">أدخل كلمة المرور للوصول</p>
+                <form id="loginForm">
+                    <input type="password" id="adminPassword" placeholder="كلمة المرور" required>
+                    <button type="submit" class="btn btn-primary">دخول</button>
+                </form>
+                <div id="loginMessage" class="message"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- صفحة الإدارة -->
+    <div id="adminPage" class="page">
+        <div class="container">
+            <div class="admin-page">
+                <div class="card">
+                    <h1>صفحة الإدارة</h1>
+                    <p class="subtitle">قم بتعديل الأسئلة والإجابات</p>
+
+                    <div id="questionsContainer" class="questions-container"></div>
+
+                    <div class="admin-actions">
+                        <button id="addQuestionBtn" class="btn btn-secondary">إضافة سؤال جديد</button>
+                        <button id="saveBtn" class="btn btn-primary">حفظ ونشر التغييرات</button>
+                        <button id="resetBtn" class="btn btn-danger">إعادة تعيين للقيم الافتراضية</button>
+                        <button id="logoutBtn" class="btn btn-danger">تسجيل الخروج</button>
+                    </div>
+
+                    <div id="saveMessage" class="message"></div>
+                </div>
+
+                <!-- قسم إدارة المراكز -->
+                <div class="card" style="margin-top: 20px;">
+                    <h1>إدارة قائمة المراكز</h1>
+                    <p class="subtitle">قم بإدارة المراكز (حذف أو تعديل)</p>
+                    <div id="leaderboardAdminContainer" class="leaderboard-admin-container"></div>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="admin.js"></script>
+</body>
+</html>
+

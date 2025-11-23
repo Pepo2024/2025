@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ركز وجاوب - مسابقة الاجتماع 3 ثانوي</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- زر فتح قائمة المراكز -->
+    <button id="leaderboardToggle" class="leaderboard-toggle-btn">
+        <span>🏆</span>
+        <span class="toggle-text">المراكز</span>
+    </button>
+
+    <!-- Sidebar قائمة المراكز -->
+    <div id="leaderboardSidebar" class="leaderboard-sidebar">
+        <div class="sidebar-header">
+            <h2>🏆 قائمة المراكز</h2>
+            <button id="closeLeaderboard" class="close-btn">✕</button>
+        </div>
+        <div id="leaderboardList" class="leaderboard-list"></div>
+    </div>
+
+    <!-- Overlay لإغلاق Sidebar -->
+    <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+    <div class="container">
+        <!-- صفحة إدخال الاسم -->
+        <div id="namePage" class="page active">
+            <div class="card">
+                <h1>ركز وجاوب</h1>
+                <p class="subtitle">مسابقة الاجتماع 3 ثانوي</p>
+                <p class="subtitle">أدخل اسمك للبدء</p>
+                <form id="nameForm">
+                    <input type="text" id="userName" placeholder="اكتب اسمك هنا" required>
+                    <button type="submit" class="btn btn-primary">ابدأ المسابقة</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- صفحة المسابقة -->
+        <div id="quizPage" class="page">
+            <div class="card">
+                <div class="quiz-header">
+                    <h2>ركز وجاوب</h2>
+                    <p class="user-name">مرحباً <span id="displayName"></span></p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <p class="question-counter">السؤال <span id="currentQuestion">1</span> من <span id="totalQuestions">5</span></p>
+                </div>
+
+                <div class="question-container">
+                    <h3 id="questionText"></h3>
+                    <div id="answersContainer" class="answers-container"></div>
+                </div>
+
+                <div class="quiz-actions">
+                    <button id="nextBtn" class="btn btn-primary" style="display: none;">التالي</button>
+                    <button id="submitBtn" class="btn btn-success" style="display: none;">إرسال الإجابات</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- صفحة النتائج -->
+        <div id="resultsPage" class="page">
+            <div class="card">
+                <h1>نتائج المسابقة</h1>
+                <div class="score-container">
+                    <div class="score-circle">
+                        <span id="scorePercentage">0</span>%
+                    </div>
+                    <p class="score-text">لقد حصلت على <span id="scoreNumber">0</span> من <span id="maxScore">5</span></p>
+                </div>
+                <div id="resultsDetails" class="results-details"></div>
+                <button id="restartBtn" class="btn btn-primary">ابدأ مسابقة جديدة</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="script.js"></script>
+</body>
+</html>
+
