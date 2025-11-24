@@ -21,6 +21,16 @@ body {
     margin: 0 auto;
 }
 
+.main-container {
+    min-height: calc(100vh - 80px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+    gap: 30px;
+    padding: 40px 0;
+}
+
 .page {
     display: none;
 }
@@ -793,6 +803,14 @@ input[type="password"]::placeholder {
         margin-top: 60px; /* مسافة من الأعلى لزر المراكز */
     }
 
+    .main-container {
+        margin-top: 0;
+        min-height: calc(100vh - 80px);
+        justify-content: center;
+        padding: 30px 0 60px;
+        gap: 20px;
+    }
+
     .card {
         padding: 20px 15px;
         margin: 10px 0;
@@ -890,6 +908,12 @@ input[type="password"]::placeholder {
 
     .container {
         margin-top: 50px; /* مسافة أقل على الشاشات الصغيرة */
+    }
+
+    .main-container {
+        min-height: calc(100vh - 70px);
+        padding: 20px 0 50px;
+        gap: 15px;
     }
 
     .card {
