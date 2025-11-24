@@ -352,7 +352,7 @@ input[type="password"]::placeholder {
 /* زر فتح قائمة المراكز */
 .leaderboard-toggle-btn {
     position: fixed;
-    top: 15px;
+    top: 60px;
     left: 15px;
     z-index: 1001;
     background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
@@ -405,7 +405,7 @@ input[type="password"]::placeholder {
 }
 
 .sidebar-header {
-    padding: 20px;
+    padding: 40px 20px 20px;
     background: #2d2d3e;
     border-bottom: 2px solid #3d3d4e;
     display: flex;
@@ -856,8 +856,8 @@ input[type="password"]::placeholder {
     }
 
     .leaderboard-toggle-btn {
-        top: 10px;
-        left: 10px;
+        top: 80px;
+        left: 12px;
         padding: 10px 15px;
         font-size: 1em;
     }
@@ -950,12 +950,13 @@ input[type="password"]::placeholder {
     }
 
     .leaderboard-toggle-btn {
+        top: 75px;
         padding: 10px;
         font-size: 0.9em;
     }
 
     .sidebar-header {
-        padding: 15px;
+        padding: 30px 15px 15px;
     }
 
     .sidebar-header h2 {
